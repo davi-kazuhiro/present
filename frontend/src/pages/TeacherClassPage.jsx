@@ -70,7 +70,7 @@ export default function TeacherClassPage() {
   const [modal, setModal] = useState('none')
   const [activeAttendance, setActiveAttendance] = useState(null)
   const [manualRequests, setManualRequests] = useState([])
-  const [loadingRequests] = useState(false)
+  const [loadingRequests, setLoadingRequests] = useState(false)
   const [approvingRequestId, setApprovingRequestId] = useState(null)
   const [turma, setTurma] = useState(null)
   const [students, setStudents] = useState([])
@@ -82,7 +82,7 @@ export default function TeacherClassPage() {
   const [opening, setOpening] = useState(false)
   const [message, setMessage] = useState('')
   const [messageType, setMessageType] = useState('error')
-  const [removingStudentId, setRemovingStudentId] = useState(null)
+  const [, setRemovingStudentId] = useState(null)
 
   const proximoNumero = useMemo(() => attendances.length + 1, [attendances.length])
 
