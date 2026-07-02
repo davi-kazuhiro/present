@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Copy, MailPlus, QrCode, RefreshCw, Trash2, UserCheck, Users } from 'lucide-react'
 import { AppLayout } from '../layout/AppLayout/AppLayout'
+import ClassBreadcrumb from '../features/classes/ClassBreadcrumb'
 import ClassHeader from '../features/classes/ClassHeader'
 import ClassActions from '../features/classes/ClassActions'
 import AttendanceList from '../features/classes/AttendanceList'
 import NewAttendanceModal from '../features/classes/NewAttendanceModal'
 import LiveAttendanceModal from '../features/classes/LiveAttendanceModal'
+import TeacherStudentsPanel from '../features/classes/TeacherStudentsPanel'
+import TeacherInvitePanel from '../features/classes/TeacherInvitePanel'
 import {
   approveManualCheckIn,
   closeAttendance,
@@ -37,7 +39,7 @@ export default function TeacherClassPage() {
   const [modal, setModal] = useState('none')
   const [activeAttendance, setActiveAttendance] = useState(null)
   const [manualRequests, setManualRequests] = useState([])
-  const [loadingRequests, setLoadingRequests] = useState(false)
+  const [loadingRequests] = useState(false)
   const [approvingRequestId, setApprovingRequestId] = useState(null)
   const [turma, setTurma] = useState(null)
   const [students, setStudents] = useState([])
@@ -324,21 +326,7 @@ export default function TeacherClassPage() {
   return (
     <AppLayout>
       <div className="flex flex-col gap-6 px-7 py-6 pb-12 max-sm:px-4">
-        <nav className="flex items-center gap-2 text-sm">
-          <button
-            type="button"
-            onClick={() => navigate('/dashboard/teacher')}
-            aria-label="Voltar para Matérias"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border-default text-text-secondary transition hover:bg-neutral-100"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <span className="text-text-secondary">Matérias</span>
-          <span className="text-text-muted">/</span>
-          <span className="font-semibold text-text-primary">
-            {turma.name} · {turma.section}
-          </span>
-        </nav>
+        <ClassBreadcrumb turma={turma} onBack={() => navigate('/dashboard/teacher')} />
 
         {message && (
           <div className="rounded-lg border border-danger-100 bg-danger-50 px-4 py-3 text-sm font-semibold text-danger-600">
@@ -349,123 +337,23 @@ export default function TeacherClassPage() {
         <ClassHeader info={{ ...turma, enrolledCount: students.length }} role="teacher"/>
         <ClassActions onAbrirChamada={handleAbrirChamada} />
 
-        <section className="grid grid-cols-[0.8fr_1.2fr] gap-4 max-lg:grid-cols-1">
-          <div className="rounded-lg border border-border-default bg-bg-card p-5 shadow-card">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-bold text-text-primary">Adicionar alunos</h2>
-                <p className="text-sm text-text-secondary">Use o e-mail que o aluno cadastrou no app.</p>
-              </div>
-              <MailPlus className="h-5 w-5 text-primary-600" />
-            </div>
+        <TeacherStudentsPanel
+          email={email}
+          students={students}
+          savingStudent={savingStudent}
+          onEmailChange={setEmail}
+          onAddStudent={handleAddStudent}
+          onRemoveStudent={handleRemoveStudent}
+        />
 
-            <form onSubmit={handleAddStudent} className="flex gap-2 max-sm:flex-col">
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="aluno@email.com"
-                className="h-11 min-w-0 flex-1 rounded-lg border border-border-default px-3 text-sm outline-none focus:border-primary-400"
-              />
-              <button
-                type="submit"
-                disabled={savingStudent}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary-800 px-4 text-sm font-semibold text-neutral-0 transition hover:bg-primary-900 disabled:opacity-60"
-              >
-                <UserCheck className="h-4 w-4" />
-                {savingStudent ? 'Adicionando...' : 'Adicionar'}
-              </button>
-            </form>
-          </div>
-
-          <div className="rounded-lg border border-border-default bg-bg-card p-5 shadow-card">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-text-primary">Alunos da matéria</h2>
-              <span className="inline-flex items-center gap-1.5 text-sm text-text-secondary">
-                <Users className="h-4 w-4" />
-                {students.length}
-              </span>
-            </div>
-            {students.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-border-default px-4 py-8 text-center text-sm text-text-secondary">
-                Nenhum aluno adicionado ainda.
-              </p>
-            ) : (
-              <div className="grid grid-cols-2 gap-2 max-md:grid-cols-1">
-                {students.map((student) => (
-                  <div key={student.id} className="flex items-center justify-between gap-2 rounded-lg border border-border-default px-3 py-2">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-text-primary">{student.name}</p>
-                      <p className="truncate text-xs text-text-secondary">{student.email}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveStudent(student.id)}
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-danger-600 transition hover:bg-danger-50"
-                      aria-label={`Remover ${student.name}`}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="rounded-lg border border-border-default bg-bg-card p-5 shadow-card">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-bold text-text-primary">Convite por QR Code</h2>
-              <p className="text-sm text-text-secondary">
-                Compartilhe com os alunos para entrarem automaticamente nesta matéria.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={invite ? handleRegenerateInvite : loadInvite}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border-default px-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
-            >
-              {invite ? <RefreshCw className="h-4 w-4" /> : <QrCode className="h-4 w-4" />}
-              {invite ? 'Regenerar token' : 'Gerar convite'}
-            </button>
-          </div>
-
-          {invite ? (
-            <div className="grid grid-cols-[180px_1fr] gap-5 max-md:grid-cols-1">
-              <img
-                src={qrUrl}
-                alt="QR Code do convite"
-                className="h-[180px] w-[180px] rounded-lg border border-border-default bg-white p-2"
-              />
-              <div className="min-w-0">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">Link de convite</p>
-                <div className="flex min-w-0 gap-2 max-sm:flex-col">
-                  <input
-                    readOnly
-                    value={inviteUrl}
-                    className="h-11 min-w-0 flex-1 rounded-lg border border-border-default bg-neutral-50 px-3 text-sm text-text-primary"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleCopyInvite}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary-800 px-4 text-sm font-semibold text-neutral-0 transition hover:bg-primary-900"
-                  >
-                    <Copy className="h-4 w-4" />
-                    Copiar
-                  </button>
-                </div>
-                <p className="mt-2 text-xs text-text-secondary">
-                  Usos: {invite.uses ?? 0}. Regenerar invalida o link anterior.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-lg border border-dashed border-border-default px-4 py-8 text-center text-sm text-text-secondary">
-              Gere um convite para exibir o QR Code e o link da matéria.
-            </div>
-          )}
-        </section>
+        <TeacherInvitePanel
+          invite={invite}
+          inviteUrl={inviteUrl}
+          qrUrl={qrUrl}
+          onCopyInvite={handleCopyInvite}
+          onLoadInvite={loadInvite}
+          onRegenerateInvite={handleRegenerateInvite}
+        />
 
         <AttendanceList
           items={attendances}
