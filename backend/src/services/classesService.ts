@@ -55,7 +55,6 @@ function mapClass(row: TeacherClassRow, schedules: ClassSchedule[] = []) {
     schedules,
     section: row.turno,
     code: `TUR-${row.id}`,
-    room: 'Local definido pelo professor',
     group: row.nome,
     enrolledCount: Number(row.enrolled_count),
     attendancesDone: Number(row.attendances_done),

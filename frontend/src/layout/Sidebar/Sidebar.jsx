@@ -4,7 +4,7 @@
 import Logo from '../../components/common/Logo/Logo'
 
 const NAV_ITEMS = [
-  { id: 'dashboard',  label: 'Dashboard',   icon: 'fa-solid fa-chart-pie' },
+  { id: 'dashboard',  label: 'Home',   icon: 'fa-solid fa-house' },
   { id: 'calendario', label: 'Calendário',  icon: 'fa-solid fa-calendar-days' },
 ]
 

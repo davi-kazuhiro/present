@@ -24,7 +24,6 @@ export default function ClassHeader({ info, role }) {
 
           <div className="mt-5 grid grid-cols-4 gap-6 max-md:grid-cols-2">
             <Meta label="Horário" value={info.schedule} />
-            <Meta label="Sala" value={info.room} />
             {isTeacher && (
               <Meta label="Alunos" value={`${info.enrolledCount} matriculados`} />
             )}
