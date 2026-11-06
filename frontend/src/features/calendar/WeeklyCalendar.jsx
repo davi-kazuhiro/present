@@ -10,8 +10,6 @@ const DAYS = [
   { index: 6, label: 'Sáb' },
 ]
 
-const START_HOUR = 6
-const END_HOUR = 23
 const HOUR_HEIGHT = 60
 
 function parseMinutes(time) {

@@ -1,8 +1,8 @@
 import Card from "@/components/common/Card/Card"; 
 import Badge from "@/components/common/Badge/Badge";   
-import { BellRing, CheckCircle2, ChevronRight } from "lucide-react";
+import { CheckCircle2, ChevronRight } from "lucide-react";
 
-export function ClassItem({ data, onOpenCheckin, onClick }) {
+export function ClassItem({ data, onClick }) {
   const hasActiveSession = Boolean(data.activeSession && !data.activeSession.answered)
   const answered = Boolean(data.activeSession?.answered)
 
